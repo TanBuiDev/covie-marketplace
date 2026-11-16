@@ -72,9 +72,12 @@ describe("ad management", () => {
     api.getAdCampaignStats.mockResolvedValue({ impressions: 200, clicks: 10, ctr: 5, days: [{ date: "2026-10-08", impressions: 200, clicks: 10, ctr: 5 }] });
     render(<AdManagement scope={{ kind: "admin" }} />);
     fireEvent.click(await screen.findByRole("button", { name: "Thống kê" }));
+    // Request the fixture's UTC date explicitly instead of relying on a rolling default.
+    fireEvent.change(screen.getByLabelText("Từ ngày"), { target: { value: "2026-10-08" } });
+    fireEvent.change(screen.getByLabelText("Đến ngày"), { target: { value: "2026-10-08" } });
+    await waitFor(() => expect(api.getAdCampaignStats).toHaveBeenCalledWith({ kind: "admin" }, "ad-1", "2026-10-08", "2026-10-08"));
     expect(await screen.findByRole("table")).toHaveTextContent("2026-10-08");
     expect(screen.getAllByText("5.00%")).toHaveLength(2);
-    expect(api.getAdCampaignStats).toHaveBeenCalledWith({ kind: "admin" }, "ad-1", expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/), expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/));
   });
   it("ignores a late list response from a previous merchant scope", async () => {
     let resolveOld: ((rows: unknown[]) => void) | undefined;
