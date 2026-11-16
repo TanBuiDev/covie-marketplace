@@ -125,6 +125,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: covie-release-${{ github.sha }}
+          retention-days: 7
           path: |
             build/release/release-manifest.env
             build/sbom/api.cdx.json
